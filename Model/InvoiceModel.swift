@@ -3,7 +3,7 @@
 
 import Foundation
 
-public class Invoice
+public class Invoice : NSObject
 {
     var invoiceNumber: Int!
     var inTime: Date!
@@ -43,18 +43,17 @@ public class Invoice
     }
     
 
-   public  func prints()
-    {
-        
-    let myCalendar = Calendar(identifier: .gregorian)
+   public  func printInvoice()
+    {       
+        let calendar = Calendar(identifier: .gregorian)
         print("VehicleNumber:    \(vehicleNumber!)")
         print("VehicleName:    \(vehicleName!)")
         print("Driver:    \(driver!)")
         print("InvoiceNumber:    \(invoiceNumber!)")
-        var ymd = myCalendar.dateComponents([.year, .month, .day , .hour ,.minute , .second ], from: inTime)
-        print("InTime:   \(ymd.hour!):\(ymd.minute!):\(ymd.second!)   \(ymd.year!)/\(ymd.month!)/\(ymd.day!)") 
-        ymd = myCalendar.dateComponents([.year, .month, .day , .hour ,.minute , .second ], from: outTime)
-        print("OutTime:   \(ymd.hour!):\(ymd.minute!):\(ymd.second!)   \(ymd.year!)/\(ymd.month!)/\(ymd.day!)")
+        var DateTime = calendar.dateComponents([.year, .month, .day , .hour ,.minute , .second ], from: inTime)
+        print("InTime:   \(DateTime.hour!):\(DateTime.minute!):\(DateTime.second!)   \(DateTime.year!)/\(DateTime.month!)/\(DateTime.day!)") 
+        DateTime = calendar.dateComponents([.year, .month, .day , .hour ,.minute , .second ], from: outTime)
+        print("OutTime:   \(DateTime.hour!):\(DateTime.minute!):\(DateTime.second!)   \(DateTime.year!)/\(DateTime.month!)/\(DateTime.day!)")
         print("totalTime:    \(totalTime!) mins")
         print("TotalAmount : \(Amount!)")       
     }
