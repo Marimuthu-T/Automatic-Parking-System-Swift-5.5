@@ -13,3 +13,9 @@ let date2 = Date()
 let distanceBetweenDates: TimeInterval? = date2.timeIntervalSince(date)
 print(distanceBetweenDates!)
 }
+
+
+//Mark: Welcome Message
+print("------------Welcom to Auto Parker------------------")
+print("       Enter Your Vehicle Type      ")
+print("       Enter Your Vehicle Number      ")

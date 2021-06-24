@@ -3,9 +3,19 @@
 
 import Foundation
 
-public class Invoice : NSObject
+enum VehicleType: Int {
+
+    case bycycle = 1  
+    case bike
+    case car
+    case sUV
+    case van
+    case bus
+}
+
+
+public class InvoiceModel
 {
-    var invoiceNumber: Int!
     var inTime: Date!
     let vehicleName: String!
     let vehicleNumber: String!
@@ -13,10 +23,11 @@ public class Invoice : NSObject
     var outTime: Date!
     var totalTime: TimeInterval?
     var Amount : Double?
+    var vehicleType: VehicleType = .car
+
 
     public init(vehicleNumber: String , vehicleName: String , driver: String)
     {
-        self.invoiceNumber = 0
         self.vehicleName = vehicleName
         self.vehicleNumber = vehicleNumber
         self.driver = driver
@@ -49,14 +60,23 @@ public class Invoice : NSObject
         print("VehicleNumber:    \(vehicleNumber!)")
         print("VehicleName:    \(vehicleName!)")
         print("Driver:    \(driver!)")
-        print("InvoiceNumber:    \(invoiceNumber!)")
         var DateTime = calendar.dateComponents([.year, .month, .day , .hour ,.minute , .second ], from: inTime)
         print("InTime:   \(DateTime.hour!):\(DateTime.minute!):\(DateTime.second!)   \(DateTime.year!)/\(DateTime.month!)/\(DateTime.day!)") 
         DateTime = calendar.dateComponents([.year, .month, .day , .hour ,.minute , .second ], from: outTime)
         print("OutTime:   \(DateTime.hour!):\(DateTime.minute!):\(DateTime.second!)   \(DateTime.year!)/\(DateTime.month!)/\(DateTime.day!)")
         print("totalTime:    \(totalTime!) mins")
-        print("TotalAmount : \(Amount!)")       
+        print("TotalAmount : \(Amount!) rupees" )       
     }
 
 }
+
+
+
+var k = InvoiceModel(vehicleNumber: "gs", vehicleName: "dvsdv" , driver: "vsdv")
+
+var out = readLine()
+
+k.VehicleOut()
+
+k.printInvoice()
 

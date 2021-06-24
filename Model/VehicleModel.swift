@@ -5,10 +5,10 @@
 
 enum VehicleType: Int {
 
-    case Bycycle = 1  
-    case Bike
-    case Car
-    case SUV
-    case Van
-    case Bus
+    case bycycle = 1  
+    case bike
+    case car
+    case sUV
+    case van
+    case bus
 }
