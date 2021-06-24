@@ -3,7 +3,10 @@
 //
 //   Model for parking slot
 
-class ParkingSlotModel
-{
-    
-}
+var k = Invoice?
+
+k = Invoice(vehicleNumber: "gs", vehicleName: "dvsdv" , driver: "vsdv")
+
+k.VehicleOut()
+
+k.prints()
