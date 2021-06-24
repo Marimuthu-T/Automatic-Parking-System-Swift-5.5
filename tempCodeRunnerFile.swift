@@ -1,3 +1,7 @@
-var f: Any? = formatter.string(from: ymd)
+var k = InvoiceModel(vehicleNumber: "gs", vehicleName: "dvsdv" , driver: "vsdv")
 
-print(f!)
+var out = readLine()
+
+k.VehicleOut()
+
+k.printInvoice()
