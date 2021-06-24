@@ -1,5 +1,3 @@
-# Automatic-Parking-System-Swift-5.5
-
 Automated Parking system
 
 This is an project  of automated parking system where the vechile can came in park and leave the slot automatically, Just by checking availability and waiting list 

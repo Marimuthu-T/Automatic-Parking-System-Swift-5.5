@@ -3,7 +3,7 @@
 // Enum for Vehile model
 
 
-enum VehivleType: Int {
+enum VehicleType: Int {
 
     case Bycycle = 1  
     case Bike
