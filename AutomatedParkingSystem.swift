@@ -14,6 +14,17 @@ var homeString = """
                          4 -> Exit
         """
 
+var vehicleTypeString = """
+
+                                       -Enter Your Vehicle Type-   
+                        1 -> bycycle  
+                        2 -> bike
+                        3 -> car
+                        4 -> sUV
+                        5 -> van
+                        6 -> bus
+        """
+
 enum VehicleType: Int {
 
     case bycycle = 1  
@@ -62,24 +73,23 @@ class InOutRegister
 {
     var RegisterId: String!
     var vehicle: VehicleDetails!
-    let driver: String!
+    var driver: String!
     var inTime: Date!
     var outTime: Date!
     var totalTime: TimeInterval?
     var Amount : Double?
+    var vehicleIn: Bool = false
     var vehicleType: VehicleType = .car
     var invoice: InvoiceModel?
 
-    init()
-    {
-        self.driver = "est"
-    }
+    init (){}
 
     init (vehicleNumber: String , vehicleName: String ,driver: String )
     {
         self.driver = driver
         self.vehicle = VehicleDetails(vehicleNumber: vehicleNumber , vehicleName: vehicleName)
         self.inTime = Date()
+        self.vehicleIn = true
     }
 
     
@@ -140,9 +150,19 @@ struct EntryExit
         print(registerCount)
     }
 
-    mutating func out(RegisterId: Int)
+    mutating func out(registerId: Int)
     {
-        let outVehicle = register[RegisterId]!
+        guard registerId > 10000 && registerId <= registerCount else
+        {
+            print("Enter Valid Register ID ")
+            return 
+        }
+        
+        let outVehicle = register[registerId]!
+        guard outVehicle.vehicleIn else {
+            print("Your Vehicle is already out")
+            return 
+        }
         outVehicle.vehicleOut()
         outVehicle.invoice = InvoiceModel(for: outVehicle)
         outVehicle.invoice!.printInvoice()
@@ -168,9 +188,10 @@ struct EntryExit
 //Mark: Welcome Message
 class HomeView
 {
-    init()
-    {
+    var counter: EntryExit!
+    init(){
         print(" -----------------------WELCOME TO AUTO PARKER-----------------------------")
+        self.counter = EntryExit()
     }
     func Home()
     {
@@ -198,9 +219,44 @@ class HomeView
             Home()
         }
     }
-    var counter = EntryExit()
+
     func vehicleIn()
     {
+        var vehicleType: VehicleType!
+        print(vehicleTypeString)
+        if let givenVehicletype = Int(readLine() ?? "k")
+        {
+            switch givenVehicletype
+            {
+                case VehicleType.bycycle.rawValue:
+                vehicleType = .bycycle
+                case VehicleType.bike.rawValue:
+                vehicleType = .bike
+                case VehicleType.car.rawValue:
+                vehicleType = .car
+                case VehicleType.sUV.rawValue:
+                vehicleType = .sUV
+                case VehicleType.van.rawValue:
+                vehicleType = .van
+                case VehicleType.bus.rawValue:
+                vehicleType = .bus
+                default:
+                print("Enter Proper Type ")
+            }
+        }
+        else
+        {
+            print("Enter proper Vehicle Type ")
+        }
+
+        print("       Enter Your Vehicle Number      ")
+        if let vehicleNumber = readLine()
+        {
+
+        }
+
+
+
         self.counter.entry()            
     }
 
@@ -209,7 +265,7 @@ class HomeView
         print("Enter Your RegisterID")
         if let RegisterID = Int(readLine() ?? "Not")
         {
-        self.counter.out(RegisterId: 10001)
+        self.counter.out(registerId: RegisterID)
         }
         else
         {
