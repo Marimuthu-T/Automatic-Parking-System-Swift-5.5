@@ -4,56 +4,34 @@
 import Foundation
 
 
-//assign(vehicle: 34)
-var homeString = """
-
-                                       -Home-   
-                         1 -> Vehicle IN
-                         2 -> Vehicle Out
-                         3 -> Other Options
-                         4 -> Exit
-        """
-
-var vehicleTypeString = """
-
-                                       -Enter Your Vehicle Type-   
-                        1 -> bycycle  
-                        2 -> bike
-                        3 -> car
-                        4 -> van
-                        5 -> bus
-        """
-
-enum VehicleType: Int {
-
-    case bycycle = 1  
-    case bike
-    case car
-    case van
-    case bus
-}
-
-//Mark: Model Parking Slot
+//MARK:  Parking Area Model
 
 class ParkingFloor
 {
     var parkingFloor = [[Int]](repeating: [Int](repeating: 0, count: 4), count: 5)
-    var isFloorAvailable: Bool = true
-    var isBusAvailable: Bool = true
-    var isCarAvailable: Bool = true
-    var isVanAvailable: Bool = true
-    var isBikeAvailable: Bool = true
-    var isBycycleAvailable: Bool = true
     var vehicleCount = 0
 
-    func park(lengthRequired: Int , Id: Int) -> (row: Int, line: Int)?
+    func parkonthisFloor(lengthRequired: Int , Id: Int) -> (row: Int, line: Int)?
     {
+        for i in 0...1
+        {
+            let parkedarea = parkOnThisRow(row: i,lengthRequired: lengthRequired , Id: Id)
+            if parkedarea != nil
+            {
+                return parkedarea
+            }
+        }
+        return nil
+    }
+    func parkOnThisRow(row: Int , lengthRequired: Int , Id: Int) -> (row: Int, line: Int)?
+    {
+        
         var lengthAvailable = 0
         var start = 0
         var linenumber = 0
         for line in parkingFloor
         {
-            if(line[2] == 0)
+            if(line[row*2] == 0)
             {
                 lengthAvailable += 1
             }
@@ -66,8 +44,8 @@ class ParkingFloor
             {
                 for i in 0...lengthRequired - 1
                 {
-                    parkingFloor[start + i][2] = Id
-                    parkingFloor[start + i][3] = Id
+                    parkingFloor[start + i][row * 2 ] = Id
+                    parkingFloor[start + i][(row * 2 ) + 1] = Id
                 }
                 return (1 , start)
             }
@@ -76,41 +54,15 @@ class ParkingFloor
         return nil
     }
 }
-
 var ParkingArea = [ParkingFloor() , ParkingFloor() , ParkingFloor() , ParkingFloor() , ParkingFloor()]
 
-func park(vehicle: Int , id: Int) -> (floor: Int , Row: Int, line: Int)?
-{
-    var floorNo = 0 
-   for floor in ParkingArea
-   {
-      if floor.isFloorAvailable
-      {
+enum VehicleType: Int {
 
-          if let slotassigned = floor.park(lengthRequired: vehicle , Id: id)
-          {
-             floor.vehicleCount = floor.vehicleCount + vehicle                 
-             return (floorNo , slotassigned.row , slotassigned.line)       
-          }
-      } 
-      floorNo += 1
-
-   }  
-   return nil
-}
-
-
-func displacing(vehicle: InOutRegister)
-{
-    let parkingFloor = ParkingArea[vehicle.parkedSlot.floor]
-    let start = vehicle.parkedSlot.line
-    let requiredLength = vehicle.vehicleType.rawValue
-    print("\(vehicle.vehicleType.rawValue)       \(vehicle.parkedSlot.line)   \(vehicle.parkedSlot.floor)")
-    for i in 0...requiredLength - 1
-         {
-            parkingFloor.parkingFloor[start + i][2] = 0
-            parkingFloor.parkingFloor[start + i][3] = 0
-         }
+    case bycycle = 1  
+    case bike
+    case car
+    case van
+    case bus
 }
 
 
@@ -197,18 +149,11 @@ class InOutRegister
 }
 
 
-func printslot(Floor requiredfloor: Int)
-{
-    let floor = ParkingArea[requiredfloor].parkingFloor
-    for line in floor
-    {
-        for row in line
-        {
-            print(row)
-        }
-        print("---")
-    }
-}
+
+
+
+
+
 
 
 
@@ -216,10 +161,57 @@ func printslot(Floor requiredfloor: Int)
 
 
 
+func park(vehicle: Int , id: Int) -> (floor: Int , Row: Int, line: Int)?
+{
+    var floorNo = 0 
+   for floor in ParkingArea
+   {
+       if let slotassigned = floor.parkonthisFloor(lengthRequired: vehicle , Id: id)
+       {
+            floor.vehicleCount = floor.vehicleCount + vehicle                 
+            return (floorNo , slotassigned.row , slotassigned.line)       
+        }
+        floorNo += 1
+   }  
+   return nil
+}
+
+
+func displacing(vehicle: InOutRegister)
+{
+    let parkingFloor = ParkingArea[vehicle.parkedSlot.floor]
+    let start = vehicle.parkedSlot.line
+    let requiredLength = vehicle.vehicleType.rawValue
+    print("\(vehicle.vehicleType.rawValue)       \(vehicle.parkedSlot.line)   \(vehicle.parkedSlot.floor)")
+    for i in 0...requiredLength - 1
+         {
+            parkingFloor.parkingFloor[start + i][2] = 0
+            parkingFloor.parkingFloor[start + i][3] = 0
+         }
+}
+
+
+
+func printslot(Floor requiredfloor: Int = 0 , all: Bool = false)
+{
+    let floor = ParkingArea[requiredfloor].parkingFloor
+    print("\nFloor: \(requiredfloor)")
+    for line in floor
+    {
+        for row in line
+        {
+            print(row,terminator:" ")
+        }
+        print("")
+    }
+}
+
+
+
+
 
 struct EntryExit
-{
-    
+{    
     var register: [Int : InOutRegister] = [0 : InOutRegister()] 
     var registerCount: Int = 10000
     mutating func entry(vehicleType: VehicleType , vehicleNumber: String , vehicleName: String ,driver: String )
@@ -267,19 +259,30 @@ struct EntryExit
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 //Mark: Welcome Message
+
+var homeString = """
+
+                                       -Home-   
+                         1 -> Vehicle IN
+                         2 -> Vehicle Out
+                         3 -> Other Options
+                         4 -> Exit
+        """
+
+var vehicleTypeString = """
+
+                                       -Enter Your Vehicle Type-   
+                        1 -> bycycle  
+                        2 -> bike
+                        3 -> car
+                        4 -> van
+                        5 -> bus
+        """
+
+
+
+
 class HomeView
 {
     var counter: EntryExit!
@@ -382,7 +385,25 @@ class HomeView
 
     func others()
     {
-
+        print("""
+                         1 -> PrintSlot
+                         2 -> InList
+                         3 -> OutList
+                         4 -> Exit
+        """)
+        if let choice = Int(readLine() ?? "4")
+        {
+            switch choice
+            {
+                case 1:
+                return printslot(all: true)
+                case 4:
+                return
+                default:
+                return
+            }
+        }
+        return 
     }
 }
 
