@@ -19,3 +19,13 @@ print(distanceBetweenDates!)
 print("------------Welcom to Auto Parker------------------")
 print("       Enter Your Vehicle Type      ")
 print("       Enter Your Vehicle Number      ")
+
+
+
+//Mark: Invehicle details
+            let car = VehicleDetails(vehicleNumber: "TN 35 RD 3423" , vehicleName: "Car" , driver: "Mr.Rick")
+           
+            car.VehicleOut()
+            
+            let carInvoice = InvoiceModel(vehicle: car)
+            carInvoice.printInvoice()

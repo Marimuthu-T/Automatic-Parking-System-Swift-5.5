@@ -3,6 +3,17 @@
 
 import Foundation
 
+
+
+var homeString = """
+
+                                       -Home-   
+                         1 -> Vehicle IN
+                         2 -> Vehicle Out
+                         3 -> Other Options
+                         4 -> Exit
+        """
+
 enum VehicleType: Int {
 
     case bycycle = 1  
@@ -15,24 +26,64 @@ enum VehicleType: Int {
 
 public class VehicleDetails
 {
-    var inTime: Date!
     let vehicleName: String!
     let vehicleNumber: String!
+
+    public init(vehicleNumber: String , vehicleName: String )
+    {
+        self.vehicleName = vehicleName
+        self.vehicleNumber = vehicleNumber
+    }
+}
+public class InvoiceModel
+{
+    weak var register: InOutRegister!
+    init(for register: InOutRegister)
+    {
+        self.register = register
+    }
+   public  func printInvoice()
+    {       
+        let calendar = Calendar(identifier: .gregorian)
+        print("VehicleNumber:    \(register.vehicle.vehicleNumber!)")
+        print("VehicleName:    \(register.vehicle.vehicleName!)")
+        print("Driver:    \(register.driver!)")
+        var DateTime = calendar.dateComponents([.year, .month, .day , .hour ,.minute , .second ], from: register.inTime)
+        print("InTime:   \(DateTime.hour!):\(DateTime.minute!):\(DateTime.second!)   \(DateTime.year!)/\(DateTime.month!)/\(DateTime.day!)") 
+        DateTime = calendar.dateComponents([.year, .month, .day , .hour ,.minute , .second ], from: register.outTime)
+        print("OutTime:   \(DateTime.hour!):\(DateTime.minute!):\(DateTime.second!)   \(DateTime.year!)/\(DateTime.month!)/\(DateTime.day!)")
+        print("totalTime:    \(register.totalTime!) mins")
+        print("TotalAmount : \(register.Amount!) rupees" )       
+    }
+
+}
+
+class InOutRegister
+{
+    var RegisterId: String!
+    var vehicle: VehicleDetails!
     let driver: String!
+    var inTime: Date!
     var outTime: Date!
     var totalTime: TimeInterval?
     var Amount : Double?
     var vehicleType: VehicleType = .car
+    var invoice: InvoiceModel?
 
-        public init(vehicleNumber: String , vehicleName: String , driver: String)
+    init()
     {
-        self.vehicleName = vehicleName
-        self.vehicleNumber = vehicleNumber
+        self.driver = "est"
+    }
+
+    init (vehicleNumber: String , vehicleName: String ,driver: String )
+    {
         self.driver = driver
+        self.vehicle = VehicleDetails(vehicleNumber: vehicleNumber , vehicleName: vehicleName)
         self.inTime = Date()
     }
 
-      public func VehicleOut()
+    
+    public func vehicleOut()
     {
         if outTime == nil 
         {
@@ -49,30 +100,10 @@ public class VehicleDetails
     {
         self.totalTime = outTime.timeIntervalSince(inTime)
         self.Amount = totalTime! * 5.00
-    }
+    }    
 }
-public class InvoiceModel
-{
-    var vehicle: VehicleDetails!
-    init(vehicle: VehicleDetails)
-    {
-        self.vehicle = vehicle
-    }
-   public  func printInvoice()
-    {       
-        let calendar = Calendar(identifier: .gregorian)
-        print("VehicleNumber:    \(vehicle.vehicleNumber!)")
-        print("VehicleName:    \(vehicle.vehicleName!)")
-        print("Driver:    \(vehicle.driver!)")
-        var DateTime = calendar.dateComponents([.year, .month, .day , .hour ,.minute , .second ], from: vehicle.inTime)
-        print("InTime:   \(DateTime.hour!):\(DateTime.minute!):\(DateTime.second!)   \(DateTime.year!)/\(DateTime.month!)/\(DateTime.day!)") 
-        DateTime = calendar.dateComponents([.year, .month, .day , .hour ,.minute , .second ], from: vehicle.outTime)
-        print("OutTime:   \(DateTime.hour!):\(DateTime.minute!):\(DateTime.second!)   \(DateTime.year!)/\(DateTime.month!)/\(DateTime.day!)")
-        print("totalTime:    \(vehicle.totalTime!) mins")
-        print("TotalAmount : \(vehicle.Amount!) rupees" )       
-    }
 
-}
+
 
 //Mark: Model Parking Slot
 
@@ -94,13 +125,28 @@ var ParkingArea = [ParkingFloor](repeating: ParkingFloor(), count: 5)
 
 
 
-class Controller
+struct EntryExit
 {
-     var vehicles:  
-     func vehicleController()
-     {
+    
+    var register: [Int : InOutRegister] = [0 : InOutRegister()] 
+    var registerCount: Int = 10000
+    mutating func entry()
+    {
+        let InVehicle = InOutRegister(vehicleNumber: "TN 35 RD 3423" , vehicleName: "Car" , driver: "Mr.Rick")
+        registerCount = registerCount + 1
+        print(registerCount)
+        self.register.updateValue(InVehicle, forKey:registerCount )
+        print("VehicleIn")
+        print(registerCount)
+    }
 
-     }
+    mutating func out(RegisterId: Int)
+    {
+        let outVehicle = register[RegisterId]!
+        outVehicle.vehicleOut()
+        outVehicle.invoice = InvoiceModel(for: outVehicle)
+        outVehicle.invoice!.printInvoice()
+    }
 }
 
 
@@ -128,22 +174,15 @@ class HomeView
     }
     func Home()
     {
-        print("""
-
-                                       -Home-   
-                         1 -> Vehicle IN
-                         2 -> Vehicle Out
-                         3 -> Other Options
-                         4 -> Exit
-        """) 
+        print(homeString) 
         if let choice = Int(readLine() ?? "4")
         {
             switch choice
             {
                 case 1:
-                VehicleIn()
+                vehicleIn()
                 case 2:
-                VehicleOut()
+                vehicleOut()
                 case 3:
                 others()
                 case 4:
@@ -159,20 +198,23 @@ class HomeView
             Home()
         }
     }
-
-    func VehicleIn()
-    {        
-            let car = VehicleDetails(vehicleNumber: "TN 35 RD 3423" , vehicleName: "Car" , driver: "Mr.Rick")
-           
-            car.VehicleOut()
-            
-            let carInvoice = InvoiceModel(vehicle: car)
-            carInvoice.printInvoice()
-            
+    var counter = EntryExit()
+    func vehicleIn()
+    {
+        self.counter.entry()            
     }
 
-    func VehicleOut()
+    func vehicleOut()
     {
+        print("Enter Your RegisterID")
+        if let RegisterID = Int(readLine() ?? "Not")
+        {
+        self.counter.out(RegisterId: 10001)
+        }
+        else
+        {
+            print("Enter proper RegisterID")
+        }
     }
 
     func others()
