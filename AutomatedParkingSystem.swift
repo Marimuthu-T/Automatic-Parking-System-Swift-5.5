@@ -4,7 +4,7 @@
 import Foundation
 
 
-
+//assign(vehicle: 34)
 var homeString = """
 
                                        -Home-   
@@ -20,9 +20,8 @@ var vehicleTypeString = """
                         1 -> bycycle  
                         2 -> bike
                         3 -> car
-                        4 -> sUV
-                        5 -> van
-                        6 -> bus
+                        4 -> van
+                        5 -> bus
         """
 
 enum VehicleType: Int {
@@ -30,10 +29,91 @@ enum VehicleType: Int {
     case bycycle = 1  
     case bike
     case car
-    case sUV
     case van
     case bus
 }
+
+//Mark: Model Parking Slot
+
+class ParkingFloor
+{
+    var parkingFloor = [[Int]](repeating: [Int](repeating: 0, count: 4), count: 5)
+    var isFloorAvailable: Bool = true
+    var isBusAvailable: Bool = true
+    var isCarAvailable: Bool = true
+    var isVanAvailable: Bool = true
+    var isBikeAvailable: Bool = true
+    var isBycycleAvailable: Bool = true
+    var vehicleCount = 0
+
+    func park(lengthRequired: Int , Id: Int) -> (row: Int, line: Int)?
+    {
+        var lengthAvailable = 0
+        var start = 0
+        var linenumber = 0
+        for line in parkingFloor
+        {
+            if(line[2] == 0)
+            {
+                lengthAvailable += 1
+            }
+            else
+            {
+                lengthAvailable = 0
+                start = linenumber + 1
+            }
+            if(lengthAvailable ==  lengthRequired)
+            {
+                for i in 0...lengthRequired - 1
+                {
+                    parkingFloor[start + i][2] = Id
+                    parkingFloor[start + i][3] = Id
+                }
+                return (1 , start)
+            }
+            linenumber += 1
+        }
+        return nil
+    }
+}
+
+var ParkingArea = [ParkingFloor() , ParkingFloor() , ParkingFloor() , ParkingFloor() , ParkingFloor()]
+
+func park(vehicle: Int , id: Int) -> (floor: Int , Row: Int, line: Int)?
+{
+    var floorNo = 0 
+   for floor in ParkingArea
+   {
+      if floor.isFloorAvailable
+      {
+
+          if let slotassigned = floor.park(lengthRequired: vehicle , Id: id)
+          {
+             floor.vehicleCount = floor.vehicleCount + vehicle                 
+             return (floorNo , slotassigned.row , slotassigned.line)       
+          }
+      } 
+      floorNo += 1
+
+   }  
+   return nil
+}
+
+
+func displacing(vehicle: InOutRegister)
+{
+    let parkingFloor = ParkingArea[vehicle.parkedSlot.floor]
+    let start = vehicle.parkedSlot.line
+    let requiredLength = vehicle.vehicleType.rawValue
+    print("\(vehicle.vehicleType.rawValue)       \(vehicle.parkedSlot.line)   \(vehicle.parkedSlot.floor)")
+    for i in 0...requiredLength - 1
+         {
+            parkingFloor.parkingFloor[start + i][2] = 0
+            parkingFloor.parkingFloor[start + i][3] = 0
+         }
+}
+
+
 
 public class VehicleDetails
 {
@@ -81,6 +161,8 @@ class InOutRegister
     var vehicleIn: Bool = false
     var vehicleType: VehicleType = .car
     var invoice: InvoiceModel?
+    var floorNo: Int?
+    var parkedSlot: (floor: Int, Row: Int, line: Int)!
 
     init (){}
 
@@ -115,19 +197,18 @@ class InOutRegister
 }
 
 
-
-//Mark: Model Parking Slot
-
-struct ParkingFloor
+func printslot(Floor requiredfloor: Int)
 {
-    var parkingFloor = [[Int]](repeating: [Int](repeating: 0, count: 5), count: 4)
-    var isFloorAvailable: Bool = true
-
+    let floor = ParkingArea[requiredfloor].parkingFloor
+    for line in floor
+    {
+        for row in line
+        {
+            print(row)
+        }
+        print("---")
+    }
 }
-
-var ParkingArea = [ParkingFloor](repeating: ParkingFloor(), count: 5)
-
-
 
 
 
@@ -145,10 +226,18 @@ struct EntryExit
     {
         let InVehicle = InOutRegister(vehicleType: vehicleType , vehicleNumber: vehicleNumber  , vehicleName: vehicleName , driver: driver )
         registerCount = registerCount + 1
-        print(registerCount)
-        self.register.updateValue(InVehicle, forKey:registerCount )
-        print("VehicleIn")
-        print(registerCount)
+        self.register.updateValue(InVehicle, forKey:registerCount )       
+         InVehicle.parkedSlot = park(vehicle: vehicleType.rawValue , id: registerCount)
+        if InVehicle.parkedSlot != nil
+        {
+        print("VehicleParkedIn")
+        print("Floor: \(InVehicle.parkedSlot.floor + 1) Row: 1 line: \(InVehicle.parkedSlot.line + 1)") 
+        printslot(Floor: InVehicle.parkedSlot.floor)
+        }
+        else
+        {
+            print("No slot Available")
+        }
     }
 
     mutating func out(registerId: Int)
@@ -168,6 +257,9 @@ struct EntryExit
         outVehicle.invoice = InvoiceModel(for: outVehicle)
         outVehicle.invoice!.printInvoice()
         outVehicle.vehicleIn = false
+        displacing(vehicle: outVehicle)
+        printslot(Floor: outVehicle.parkedSlot.floor)
+         
     }
 }
 
@@ -239,19 +331,19 @@ class HomeView
                 vehicleType = .bike
                 case VehicleType.car.rawValue:
                 vehicleType = .car
-                case VehicleType.sUV.rawValue:
-                vehicleType = .sUV
                 case VehicleType.van.rawValue:
                 vehicleType = .van
                 case VehicleType.bus.rawValue:
                 vehicleType = .bus
                 default:
                 print("Enter Proper Type ")
+                return 
             }
         }
         else
         {
             print("Enter proper Vehicle Type ")
+            return 
         }
 
         print("       Enter Your Vehicle Number      ")
