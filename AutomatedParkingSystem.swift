@@ -84,10 +84,11 @@ class InOutRegister
 
     init (){}
 
-    init (vehicleNumber: String , vehicleName: String ,driver: String )
+    init (vehicleType: VehicleType , vehicleNumber: String , vehicleName: String ,driver: String )
     {
         self.driver = driver
-        self.vehicle = VehicleDetails(vehicleNumber: vehicleNumber , vehicleName: vehicleName)
+        self.vehicle = VehicleDetails(vehicleNumber: vehicleNumber , vehicleName: vehicleName )
+        self.vehicleType = vehicleType
         self.inTime = Date()
         self.vehicleIn = true
     }
@@ -140,9 +141,9 @@ struct EntryExit
     
     var register: [Int : InOutRegister] = [0 : InOutRegister()] 
     var registerCount: Int = 10000
-    mutating func entry()
+    mutating func entry(vehicleType: VehicleType , vehicleNumber: String , vehicleName: String ,driver: String )
     {
-        let InVehicle = InOutRegister(vehicleNumber: "TN 35 RD 3423" , vehicleName: "Car" , driver: "Mr.Rick")
+        let InVehicle = InOutRegister(vehicleType: vehicleType , vehicleNumber: vehicleNumber  , vehicleName: vehicleName , driver: driver )
         registerCount = registerCount + 1
         print(registerCount)
         self.register.updateValue(InVehicle, forKey:registerCount )
@@ -166,6 +167,7 @@ struct EntryExit
         outVehicle.vehicleOut()
         outVehicle.invoice = InvoiceModel(for: outVehicle)
         outVehicle.invoice!.printInvoice()
+        outVehicle.vehicleIn = false
     }
 }
 
@@ -223,6 +225,9 @@ class HomeView
     func vehicleIn()
     {
         var vehicleType: VehicleType!
+        var vehicleNumber: String!
+        var driverName: String!
+
         print(vehicleTypeString)
         if let givenVehicletype = Int(readLine() ?? "k")
         {
@@ -250,14 +255,24 @@ class HomeView
         }
 
         print("       Enter Your Vehicle Number      ")
-        if let vehicleNumber = readLine()
+        if let givenVehicleNumber = readLine()
         {
-
+            vehicleNumber = givenVehicleNumber
+        }
+        else{
+            print("Enter Proper Name")
+        }
+        print("Enter Driver Name")
+        if let givenDriverName = readLine()
+        {
+            driverName = givenDriverName
+        }
+        else{
+            print("Enter Proper Name")
         }
 
 
-
-        self.counter.entry()            
+        self.counter.entry(vehicleType: vehicleType, vehicleNumber: vehicleNumber , vehicleName: "car" ,driver: driverName )            
     }
 
     func vehicleOut()
